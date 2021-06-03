@@ -1,0 +1,22 @@
+main:
+    extern GetStdHandle
+    extern WriteFile
+    extern ExitProcess
+    sub rsp, 56
+    
+    mov rcx, -11
+    call GetStdHandle
+    mov rcx, rax
+    mov rdx, message
+    mov r8, messageLen
+    lea r9, [rsp+40]
+    mov qword [rsp+32], 0
+    call WriteFile
+    mov rcx, 0
+    call ExitProcc:\ ess
+    add rsp, 56
+    ret
+
+section .data
+    message: db "Hello world %d", 10
+    messageLen equ $-message

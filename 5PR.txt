@@ -1,0 +1,76 @@
+;len = r8
+;tmp = eax
+;p = r9
+;n = rbx
+;d = edx
+
+section .text
+    global main
+    extern GetStdHandle
+    extern WriteFile
+    extern ExitProcess
+
+main:
+    sub rsp, 40
+    mov rcx, message
+    mov rdx, messageLen
+    call print
+
+    mov rcx, buf
+    mov rdx, 420
+    call itoa
+ 
+    mov rdx, rax
+    call print
+    mov rcx, 0
+    call ExitProcess
+    add rsp, 40
+    ret
+
+print: 
+     sub rsp, 56
+     mov [rsp + 64], rcx
+     mov [rsp + 72], rdx
+     mov rcx, -11
+     call GetStdHandle
+     mov rcx, rax
+     mov rdx, [rsp + 64]
+     mov r8, [rsp + 72]
+     lea r9, [rsp + 40]
+     mov qword [rsp + 32], 0
+     call WriteFile
+     add rsp, 56
+     ret
+
+itoa:
+    mov r10, rdx
+    mov r8, 0
+    mov eax, edx
+    mov ebx, 10
+S1:
+    inc r8
+    mov edx, 0
+    div ebx
+    cmp eax, 0
+    jg S1
+
+    lea r9, [rcx + r8]
+    mov rax, r10
+S2:
+    mov edx, 0
+    div ebx
+    dec r9
+    add dl, '0'
+    mov [r9], dl
+    cmp eax, 0
+    jg S2
+    
+    mov rax, r8
+    ret
+
+section .bss
+    buf: resb 20
+
+section .data
+    message: db "Hello world", 10
+    messageLen equ $-message
